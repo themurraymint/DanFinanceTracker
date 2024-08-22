@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .dashboard {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .symbol-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .symbol-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .symbol-name {
+            font-weight: bold;
+        }
+        .symbol-price {
+            font-size: 1.2em;
+        }
+        .symbol-change {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+        }
+        .positive {
+            background-color: #4CAF50;
+        }
+        .negative {
+            background-color: #F44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>My Symbols</h1>
+        <ul class="symbol-list" id="symbolList">
+            <!-- Symbols will be dynamically added here -->
+        </ul>
+    </div>
+
+    <script>
+        // List of symbols to fetch
+        const symbols = [
+            "^DJI", "^FTSE", "AAPL", "BARC.L", "DIS", "GE", "LLOY.L", "NKE", "SBUX",
+            // Add top 10 currencies, bonds, equities, and commodities here
+        ];
+
+        async function fetchStockData(symbol) {
+            // Replace with actual Yahoo Finance API call
+            // This is a placeholder and won't work without proper setup
+            const response = await fetch(`https://your-yahoo-finance-api-endpoint?symbol=${symbol}`);
+            const data = await response.json();
+            return data;
+        }
+
+        function updateDashboard() {
+            const symbolList = document.getElementById('symbolList');
+            symbolList.innerHTML = ''; // Clear existing list
+
+            symbols.forEach(async (symbol) => {
+                try {
+                    const data = await fetchStockData(symbol);
+                    const listItem = document.createElement('li');
+                    listItem.className = 'symbol-item';
+                    
+                    const change = parseFloat(data.change);
+                    const changeClass = change >= 0 ? 'positive' : 'negative';
+
+                    listItem.innerHTML = `
+                        <span class="symbol-name">${data.shortName}</span>
+                        <span class="symbol-price">${data.regularMarketPrice}</span>
+                        <span class="symbol-change ${changeClass}">${change.toFixed(2)}</span>
+                    `;
+
+                    symbolList.appendChild(listItem);
+                } catch (error) {
+                    console.error(`Error fetching data for ${symbol}:`, error);
+                }
+            });
+        }
+
+        // Update dashboard every 60 seconds
+        updateDashboard();
+        setInterval(updateDashboard, 60000);
+    </script>
+</body>
+</html>
